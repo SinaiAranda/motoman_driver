@@ -14,6 +14,7 @@ find_package(
     motoman_msgs
     roscpp
     sensor_msgs
+    roslint
     simple_message
     std_msgs
     std_srvs
@@ -22,6 +23,8 @@ find_package(
 )
 
 find_package(Boost REQUIRED COMPONENTS system thread)
+
+roslint_cpp()
 
 #######################################
 ## Adding directories and definitions #
@@ -119,7 +122,8 @@ set_target_properties(motoman_robot_state
 add_executable(motoman_motion_streaming_interface
   src/joint_streaming_node.cpp
   src/joint_trajectory_streamer.cpp
-  src/motion_ctrl.cpp)
+  src/motion_ctrl.cpp
+  src/io_ctrl.cpp)
 target_link_libraries(motoman_motion_streaming_interface
   motoman_simple_message
   motoman_industrial_robot_client
@@ -160,6 +164,7 @@ set_target_properties(motoman_robot_state_bswap
 add_executable(motoman_motion_streaming_interface_bswap
   src/joint_streaming_node.cpp
   src/joint_trajectory_streamer.cpp
+  src/io_ctrl.cpp
   src/motion_ctrl.cpp)
 target_link_libraries(motoman_motion_streaming_interface_bswap
   motoman_simple_message_bswap
