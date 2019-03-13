@@ -1,15 +1,17 @@
-﻿  ------ Now building project: MotoRosDX1_------
+﻿  ------ Now building project: MotoRosDX100------
   Compiling Controller.c
-Controller.c : warning : In function `Db_Print'
-Controller.c(973): warning : unused parameter `msgFormat'
   Compiling CtrlGroup.c
 CtrlGroup.c : warning : In function `Ros_CtrlGroup_IsRobot'
-CtrlGroup.c(632): warning : comparison of unsigned expression >= 0 is always true
-  Compiling IoServer.c
+CtrlGroup.c(520): warning : comparison of unsigned expression >= 0 is always true
   Compiling MotionServer.c
+MotionServer.c : warning : In function `Ros_MotionServer_WaitForSimpleMsg'
+MotionServer.c(303): warning : comparison between signed and unsigned
+MotionServer.c(334): warning : comparison between signed and unsigned
+MotionServer.c : warning : In function `Ros_MotionServer_SimpleMsgProcess'
+MotionServer.c(413): warning : comparison between signed and unsigned
   Compiling mpMain.c
   Compiling SimpleMessage.c
   Compiling StateServer.c
-  Building MotoRosDX1_.out
-  Build Successful!  Check 'DX100\MotoRosDX1_' folder for MotoRosDX1_.out
+  Building MotoRosDX100.out
+  Build Successful!  Check 'DX100\MotoRosDX100' folder for MotoRosDX100.out
   ------

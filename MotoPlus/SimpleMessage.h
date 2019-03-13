@@ -32,9 +32,11 @@
 #ifndef SIMPLE_MSG_H
 #define SIMPLE_MSG_H
 
-#define ROS_MAX_JOINT 10
-#define MOT_MAX_GR	4
+#include "MotoPlus.h"
+#include "CtrlGroup.h"
 
+#define ROS_MAX_JOINT 10
+#define MOT_MAX_GR     4
 
 //----------------
 // Prefix Section
@@ -53,13 +55,10 @@ typedef enum
 {
 	ROS_MSG_GET_VERSION = 2,
 	ROS_MSG_ROBOT_STATUS = 13,
-
 	ROS_MSG_JOINT_TRAJ_PT_FULL = 14,
 	ROS_MSG_JOINT_FEEDBACK = 15,
-
 	ROS_MSG_MOTO_MOTION_CTRL = 2001,
 	ROS_MSG_MOTO_MOTION_REPLY = 2002,
-
 	ROS_MSG_MOTO_READ_IO_BIT = 2003,
 	ROS_MSG_MOTO_READ_IO_BIT_REPLY = 2004,
 	ROS_MSG_MOTO_WRITE_IO_BIT = 2005,
@@ -68,8 +67,6 @@ typedef enum
 	ROS_MSG_MOTO_READ_IO_GROUP_REPLY = 2008,
 	ROS_MSG_MOTO_WRITE_IO_GROUP = 2009,
 	ROS_MSG_MOTO_WRITE_IO_GROUP_REPLY = 2010,
-	ROS_MSG_MOTO_IOCTRL_REPLY = 2011,
-
 	ROS_MSG_MOTO_JOINT_TRAJ_PT_FULL_EX = 2016,
 	ROS_MSG_MOTO_JOINT_FEEDBACK_EX = 2017
 } SmMsgType;
@@ -162,14 +159,6 @@ struct _SmHeader
 } __attribute__((__packed__));
 typedef struct _SmHeader SmHeader;
 
-typedef enum
-{
-	Valid_Time = 1,
-	Valid_Position = 2,
-	Valid_Velocity = 4,
-	Valid_Acceleration = 8
-} FlagsValidFields;
-
 //--------------
 // Body Section
 //--------------
@@ -190,7 +179,7 @@ struct _SmBodyJointTrajPtFull	// ROS_MSG_JOINT_TRAJ_PT_FULL = 14
 {
 	int groupNo;  				// Robot/group ID;  0 = 1st robot 
 	int sequence;				// Index of point in trajectory; 0 = Initial trajectory point, which should match the robot current position.
-	FlagsValidFields validFields;	// Bit-mask indicating which “optional” fields are filled with data. 1=time, 2=position, 4=velocity, 8=acceleration
+	int validFields;			// Bit-mask indicating which “optional” fields are filled with data. 1=time, 2=position, 4=velocity, 8=acceleration
 	float time;					// Timestamp associated with this trajectory point; Units: in seconds 
 	float pos[ROS_MAX_JOINT];	// Desired joint positions in radian.  Base to Tool joint order  
 	float vel[ROS_MAX_JOINT];	// Desired joint velocities in radian/sec.  
@@ -201,16 +190,16 @@ typedef struct _SmBodyJointTrajPtFull SmBodyJointTrajPtFull;
 struct _SmBodyJointFeedback		// ROS_MSG_JOINT_FEEDBACK = 15
 {
 	int groupNo;  				// Robot/group ID;  0 = 1st robot 
-	FlagsValidFields validFields;	// Bit-mask indicating which “optional” fields are filled with data. 1=time, 2=position, 4=velocity, 8=acceleration
+	int validFields;			// Bit-mask indicating which “optional” fields are filled with data. 1=time, 2=position, 4=velocity, 8=acceleration
 	float time;					// Timestamp associated with this trajectory point; Units: in seconds 
-	float pos[ROS_MAX_JOINT];	// Feedback joint positions in radian.  Base to Tool joint order  
-	float vel[ROS_MAX_JOINT];	// Feedback joint velocities in radian/sec.  
-	float acc[ROS_MAX_JOINT];	// Feedback joint accelerations in radian/sec^2.
+	float pos[ROS_MAX_JOINT];	// Desired joint positions in radian.  Base to Tool joint order  
+	float vel[ROS_MAX_JOINT];	// Desired joint velocities in radian/sec.  
+	float acc[ROS_MAX_JOINT];	// Desired joint accelerations in radian/sec^2.
 } __attribute__((__packed__));
 typedef struct _SmBodyJointFeedback SmBodyJointFeedback;
 
 
-struct _SmBodyMotoMotionCtrl	// ROS_MSG_MOTO_MOTION_CTRL = 2001
+struct _SmBodyMotoMotionCtrl	// ROS_MSG_MOTO_MOTION_CTRL = 2011
 {
 	int groupNo;  				// Robot/group ID;  0 = 1st robot 
 	int sequence;				// Optional message tracking number that will be echoed back in the response.
@@ -220,7 +209,7 @@ struct _SmBodyMotoMotionCtrl	// ROS_MSG_MOTO_MOTION_CTRL = 2001
 typedef struct _SmBodyMotoMotionCtrl SmBodyMotoMotionCtrl;
 
 
-struct _SmBodyMotoMotionReply	// ROS_MSG_MOTO_MOTION_REPLY = 2002
+struct _SmBodyMotoMotionReply	// ROS_MSG_MOTO_MOTION_REPLY = 2012
 {
 	int groupNo;  				// Robot/group ID;  0 = 1st robot 
 	int sequence;				// Optional message tracking number that will be echoed back in the response.
@@ -234,7 +223,7 @@ typedef struct _SmBodyMotoMotionReply SmBodyMotoMotionReply;
 struct _SmBodyJointTrajPtExData
 {
 	int groupNo;  				// Robot/group ID;  0 = 1st robot 
-	FlagsValidFields validFields;	// Bit-mask indicating which “optional” fields are filled with data. 1=time, 2=position, 4=velocity, 8=acceleration
+	int validFields;			// Bit-mask indicating which “optional” fields are filled with data. 1=time, 2=position, 4=velocity, 8=acceleration
 	float time;					// Timestamp associated with this trajectory point; Units: in seconds 
 	float pos[ROS_MAX_JOINT];	// Desired joint positions in radian.  Base to Tool joint order  
 	float vel[ROS_MAX_JOINT];	// Desired joint velocities in radian/sec.  
@@ -314,12 +303,6 @@ struct _SmBodyMotoWriteIOGroupReply
 } __attribute__((__packed__));
 typedef struct _SmBodyMotoWriteIOGroupReply SmBodyMotoWriteIOGroupReply;
 
-struct _SmBodyMotoIoCtrlReply	// ROS_MSG_MOTO_IOCTRL_REPLY = 2011
-{
-	SmResultType result;		// High level result code
-	int subcode;				// More detailed result code (optional)
-} __attribute__((__packed__));
-typedef struct _SmBodyMotoIoCtrlReply SmBodyMotoIoCtrlReply;
 
 //--------------
 // Body Union
@@ -342,7 +325,6 @@ typedef union
 	SmBodyMotoReadIOGroupReply readIOGroupReply;
 	SmBodyMotoWriteIOGroup writeIOGroup;
 	SmBodyMotoWriteIOGroupReply writeIOGroupReply;
-	SmBodyMotoIoCtrlReply ioCtrlReply;
 } SmBody;
 
 //-------------------
@@ -366,13 +348,11 @@ extern void Ros_SimpleMsg_JointFeedbackEx_Init(int numberOfGroups, SimpleMsg* se
 extern int Ros_SimpleMsg_JointFeedbackEx_Build(int groupIndex, SimpleMsg* src_msgFeedback, SimpleMsg* dst_msgExtendedFeedback);
 
 extern int Ros_SimpleMsg_MotionReply(SimpleMsg* receiveMsg, int result, int subcode, SimpleMsg* replyMsg, int ctrlGrp);
-extern int Ros_SimpleMsg_IoReply(int result, int subcode, SimpleMsg* replyMsg);
 
 //Uncomment the DEBUG definition to enable debug-messages at runtime
 //#define DEBUG  1
 
 #ifdef DEBUG
-#warning Dont forget to disable the DEBUG flag
 // function to dump data structure for debugging
 extern void Ros_SimpleMsg_DumpTrajPtFull(SmBodyJointTrajPtFull* data);
 #endif
